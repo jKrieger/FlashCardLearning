@@ -47,3 +47,9 @@ vite.config.d.ts
 
 ### Claude Code workspace settings ###
 .claude/
+
+### Playwright screenshots (Debug-Artefakte) ###
+.playwright-mcp/
+*.png
+!public/*.png
+

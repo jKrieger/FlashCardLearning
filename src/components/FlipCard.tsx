@@ -11,6 +11,10 @@ const FlipCard = forwardRef<HTMLButtonElement, Props>(function FlipCard(
   { front, back, flipped, onFlip },
   ref
 ) {
+  const label = flipped
+    ? `Antwort: ${back}. Klicken, um zur Frage zurückzukehren.`
+    : `Frage: ${front}. Klicken, um die Antwort zu sehen.`;
+
   return (
     <button
       ref={ref}
@@ -18,18 +22,10 @@ const FlipCard = forwardRef<HTMLButtonElement, Props>(function FlipCard(
       className={`flipcard ${flipped ? 'is-flipped' : ''}`}
       onClick={onFlip}
       aria-pressed={flipped}
-      aria-label={flipped ? `Antwort: ${back}. Klicken, um zur Frage zurückzukehren.` : `Frage: ${front}. Klicken, um die Antwort zu sehen.`}
+      aria-label={label}
     >
-      <span className="flipcard-inner" aria-hidden="true">
-        <span className="flipcard-face flipcard-face-front">
-          <span className="flipcard-label">Frage</span>
-          <span className="flipcard-content">{front}</span>
-        </span>
-        <span className="flipcard-face flipcard-face-back">
-          <span className="flipcard-label">Antwort</span>
-          <span className="flipcard-content">{back}</span>
-        </span>
-      </span>
+      <span className="flipcard-label">{flipped ? 'Antwort' : 'Frage'}</span>
+      <span className="flipcard-content">{flipped ? back : front}</span>
     </button>
   );
 });

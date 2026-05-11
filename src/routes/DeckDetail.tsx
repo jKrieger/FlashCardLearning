@@ -5,7 +5,7 @@ import { deleteCard, listCards } from '../db/cards';
 import { computeDeckStats } from '../domain/stats';
 import { getCardStatus } from '../domain/algorithm';
 import type { Card, Deck, DeckStats } from '../domain/types';
-import ProgressBar from '../components/ProgressBar';
+import DeckDonut from '../components/DeckDonut';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { exportDeck, triggerDownload } from '../util/jsonIO';
 import { useDocumentTitle } from '../util/title';
@@ -80,101 +80,103 @@ export default function DeckDetail() {
 
   return (
     <div className="deck-detail">
-      <div className="deck-detail-head">
-        {editName ? (
-          <form onSubmit={onSaveName} className="form-inline">
-            <label className="sr-only" htmlFor="deck-name">Name</label>
+      <header className="page-header page-header-row">
+        <Link to="/" className="btn btn-ghost btn-sm" aria-label="Zurück zur Stapel-Übersicht">
+          ← Stapel
+        </Link>
+        <div className="page-header-actions">
+          <button className="btn btn-ghost btn-sm" onClick={() => setEditName(true)}>Umbenennen</button>
+          <button className="btn btn-ghost btn-sm" onClick={onExport}>Exportieren</button>
+          <button
+            className="btn btn-ghost btn-sm text-danger"
+            onClick={() => setConfirm({ kind: 'deleteDeck' })}
+          >
+            Löschen
+          </button>
+        </div>
+      </header>
+
+      {editName ? (
+        <form onSubmit={onSaveName} className="form-card">
+          <label>
+            Name
+            <input value={name} onChange={(e) => setName(e.target.value)} required />
+          </label>
+          <label>
+            Beschreibung
             <input
-              id="deck-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <label className="sr-only" htmlFor="deck-desc">Beschreibung</label>
-            <input
-              id="deck-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beschreibung"
+              placeholder="Worum geht's?"
             />
+          </label>
+          <div className="form-actions">
             <button type="submit" className="btn btn-primary">Speichern</button>
             <button type="button" className="btn" onClick={() => setEditName(false)}>Abbrechen</button>
-          </form>
-        ) : (
-          <>
-            <div>
-              <h1>{deck.name}</h1>
-              {deck.description && <p className="muted">{deck.description}</p>}
-            </div>
-            <div className="toolbar-actions">
-              <button className="btn" onClick={() => setEditName(true)}>Umbenennen</button>
-              <button className="btn" onClick={onExport}>Exportieren</button>
-              <button className="btn btn-danger" onClick={() => setConfirm({ kind: 'deleteDeck' })}>Löschen</button>
-            </div>
-          </>
-        )}
-      </div>
-
-      <ProgressBar stats={stats} />
+          </div>
+        </form>
+      ) : (
+        <div className="deck-summary">
+          <DeckDonut stats={stats} size={120} stroke={12} />
+          <div>
+            <h1>{deck.name}</h1>
+            {deck.description && <p className="muted">{deck.description}</p>}
+            <p className="deck-summary-meta">
+              {cardWord(cards.length)} · {stats.masteredCount} sicher · {stats.learningCount} im Lernen · {stats.newCount} neu
+            </p>
+          </div>
+        </div>
+      )}
 
       {hasCards ? (
         <div className="deck-actions">
-          <Link to={`/decks/${deck.id}/study`} className="btn btn-primary">Lernen starten</Link>
-          <Link to={`/decks/${deck.id}/cards/new`} className="btn">Karte hinzufügen</Link>
+          <Link to={`/decks/${deck.id}/study`} className="btn btn-primary btn-block">Lernen starten</Link>
         </div>
       ) : (
         <div className="empty-state empty-state-inline">
-          <p>Noch keine Karten in diesem Stapel.</p>
-          <div className="empty-state-actions">
-            <Link to={`/decks/${deck.id}/cards/new`} className="btn btn-primary">Erste Karte anlegen</Link>
-          </div>
+          <p>Noch keine Karten. Tippe auf das <strong>+</strong> unten, um die erste Karte anzulegen.</p>
         </div>
       )}
 
       {hasCards && (
         <>
           <h2 className="section-title">Karten ({cardWord(cards.length)})</h2>
-          <div className="table-scroll">
-            <table className="card-table">
-              <thead>
-                <tr>
-                  <th>Frage</th>
-                  <th>Antwort</th>
-                  <th>Status</th>
-                  <th>Richtig / Falsch</th>
-                  <th>Gewicht</th>
-                  <th>Aktionen</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cards.map((card) => {
-                  const status = getCardStatus(card);
-                  return (
-                    <tr key={card.id}>
-                      <td data-label="Frage" className="cell-text">{card.front}</td>
-                      <td data-label="Antwort" className="cell-text">{card.back}</td>
-                      <td data-label="Status">
-                        <span className={`badge badge-${status}`}>
-                          {status === 'new' ? 'neu' : status === 'learning' ? 'im Lernen' : 'sicher'}
-                        </span>
-                      </td>
-                      <td data-label="Richtig / Falsch">{card.correctCount} / {card.wrongCount}</td>
-                      <td data-label="Gewicht">{card.weight}</td>
-                      <td data-label="Aktionen" className="cell-actions">
-                        <Link to={`/decks/${deck.id}/cards/${card.id}/edit`} className="btn btn-sm">Bearbeiten</Link>
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => setConfirm({ kind: 'deleteCard', cardId: card.id, preview: card.front.slice(0, 60) })}
-                        >
-                          Löschen
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ul className="card-list">
+            {cards.map((card) => {
+              const status = getCardStatus(card);
+              return (
+                <li key={card.id} className="card-list-item">
+                  <div className="card-list-text">
+                    <div className="card-list-front">{card.front}</div>
+                    <div className="card-list-back">{card.back}</div>
+                    <div className="card-list-meta">
+                      <span className={`badge badge-${status}`}>
+                        {status === 'new' ? 'neu' : status === 'learning' ? 'im Lernen' : 'sicher'}
+                      </span>
+                      <span className="muted small">{card.correctCount}✓ · {card.wrongCount}✗</span>
+                    </div>
+                  </div>
+                  <div className="card-list-actions">
+                    <Link
+                      to={`/decks/${deck.id}/cards/${card.id}/edit`}
+                      className="btn btn-ghost btn-sm"
+                      aria-label="Karte bearbeiten"
+                    >
+                      ✎
+                    </Link>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm text-danger"
+                      aria-label="Karte löschen"
+                      onClick={() => setConfirm({ kind: 'deleteCard', cardId: card.id, preview: card.front.slice(0, 60) })}
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </>
       )}
 

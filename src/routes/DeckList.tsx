@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { createDeck, listDecks } from '../db/decks';
 import { listCards } from '../db/cards';
 import { computeDeckStats } from '../domain/stats';
@@ -14,12 +15,14 @@ interface DeckRow {
 
 export default function DeckList() {
   useDocumentTitle('Deine Stapel');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rows, setRows] = useState<DeckRow[] | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   async function refresh() {
     const decks = await listDecks();
@@ -35,6 +38,20 @@ export default function DeckList() {
   useEffect(() => {
     refresh();
   }, []);
+
+  // FAB triggers form via ?new=1
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setShowForm(true);
+      const params = new URLSearchParams(searchParams);
+      params.delete('new');
+      setSearchParams(params, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (showForm) nameInputRef.current?.focus();
+  }, [showForm]);
 
   async function onCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -64,30 +81,25 @@ export default function DeckList() {
 
   return (
     <div className="decklist">
-      <div className="decklist-toolbar">
+      <header className="page-header">
         <h1>Deine Stapel</h1>
-        <div className="toolbar-actions">
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Importieren
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json,.json"
-            onChange={onImport}
-            className="sr-only"
-            tabIndex={-1}
-            aria-hidden="true"
-          />
-          <button className="btn btn-primary" onClick={() => setShowForm((v) => !v)}>
-            {showForm ? 'Abbrechen' : 'Neuer Stapel'}
-          </button>
-        </div>
-      </div>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          JSON importieren
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          onChange={onImport}
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+      </header>
 
       {importError && <div className="alert alert-error" role="alert">{importError}</div>}
 
@@ -96,11 +108,11 @@ export default function DeckList() {
           <label>
             Name
             <input
+              ref={nameInputRef}
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="z.B. OIDC/OAuth2"
-              autoFocus
               required
             />
           </label>
@@ -123,18 +135,16 @@ export default function DeckList() {
       {rows.length === 0 ? (
         <div className="empty-state">
           <h2>Noch keine Stapel</h2>
-          <p>Lege deinen ersten Karteikartenstapel an — oder importiere einen vorhandenen JSON-Export.</p>
-          <div className="empty-state-actions">
-            <button className="btn btn-primary" onClick={() => setShowForm(true)}>Neuen Stapel anlegen</button>
-            <button className="btn" onClick={() => fileInputRef.current?.click()}>JSON importieren</button>
-          </div>
+          <p>Tippe auf das <strong>+</strong> unten, um deinen ersten Stapel anzulegen — oder importiere einen vorhandenen JSON-Export.</p>
         </div>
       ) : (
-        <div className="deck-grid">
+        <ul className="deck-list">
           {rows.map(({ deck, stats }) => (
-            <DeckTile key={deck.id} deck={deck} stats={stats} />
+            <li key={deck.id}>
+              <DeckTile deck={deck} stats={stats} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

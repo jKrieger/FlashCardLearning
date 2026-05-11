@@ -3,6 +3,8 @@ import DeckList from './routes/DeckList';
 import DeckDetail from './routes/DeckDetail';
 import Study from './routes/Study';
 import CardEditor from './routes/CardEditor';
+import Info from './routes/Info';
+import BottomNav from './components/BottomNav';
 
 export default function App() {
   return (
@@ -14,6 +16,7 @@ export default function App() {
       <main id="main" className="app-main" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<DeckList />} />
+          <Route path="/info" element={<Info />} />
           <Route path="/decks/:deckId" element={<DeckDetail />} />
           <Route path="/decks/:deckId/study" element={<Study />} />
           <Route path="/decks/:deckId/cards/new" element={<CardEditor />} />
@@ -21,6 +24,7 @@ export default function App() {
           <Route path="*" element={<p>Seite nicht gefunden.</p>} />
         </Routes>
       </main>
+      <BottomNav />
     </div>
   );
 }

@@ -48,6 +48,10 @@ vite.config.d.ts
 ### Claude Code workspace settings ###
 .claude/
 
+### IntelliJ / JetBrains workspace ###
+.idea/
+*.iml
+
 ### Playwright screenshots (Debug-Artefakte) ###
 .playwright-mcp/
 *.png

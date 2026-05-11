@@ -56,4 +56,5 @@ vite.config.d.ts
 .playwright-mcp/
 *.png
 !public/*.png
+!docs/**/*.png
 

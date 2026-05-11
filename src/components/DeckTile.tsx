@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import type { Deck, DeckStats } from '../domain/types';
 import DeckDonut from './DeckDonut';
 import { cardWord } from '../util/format';
@@ -25,7 +26,7 @@ export default function DeckTile({ deck, stats }: Props) {
           <span className="deck-tile-sub">{subtitle}</span>
         </p>
       </div>
-      <span className="deck-tile-chevron" aria-hidden="true">›</span>
+      <ChevronRight className="deck-tile-chevron" size={22} aria-hidden="true" />
     </Link>
   );
 }

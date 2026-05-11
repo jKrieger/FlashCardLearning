@@ -5,8 +5,8 @@ import { listCards } from '../db/cards';
 import { computeDeckStats } from '../domain/stats';
 import type { Deck, DeckStats } from '../domain/types';
 import DeckTile from '../components/DeckTile';
-import { importDeckFromFile } from '../util/jsonIO';
 import { useDocumentTitle } from '../util/title';
+import { DATA_CHANGED_EVENT } from '../App';
 
 interface DeckRow {
   deck: Deck;
@@ -20,8 +20,6 @@ export default function DeckList() {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [importError, setImportError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   async function refresh() {
@@ -37,6 +35,9 @@ export default function DeckList() {
 
   useEffect(() => {
     refresh();
+    const handler = () => refresh();
+    window.addEventListener(DATA_CHANGED_EVENT, handler);
+    return () => window.removeEventListener(DATA_CHANGED_EVENT, handler);
   }, []);
 
   // FAB triggers form via ?new=1
@@ -63,45 +64,13 @@ export default function DeckList() {
     await refresh();
   }
 
-  async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImportError(null);
-    try {
-      await importDeckFromFile(file);
-      await refresh();
-    } catch (err) {
-      setImportError(err instanceof Error ? err.message : 'Import fehlgeschlagen');
-    } finally {
-      e.target.value = '';
-    }
-  }
-
   if (rows === null) return <p>Lade …</p>;
 
   return (
     <div className="decklist">
       <header className="page-header">
         <h1>Deine Stapel</h1>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          JSON importieren
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/json,.json"
-          onChange={onImport}
-          className="sr-only"
-          tabIndex={-1}
-          aria-hidden="true"
-        />
       </header>
-
-      {importError && <div className="alert alert-error" role="alert">{importError}</div>}
 
       {showForm && (
         <form className="form-card" onSubmit={onCreate}>
@@ -135,7 +104,7 @@ export default function DeckList() {
       {rows.length === 0 ? (
         <div className="empty-state">
           <h2>Noch keine Stapel</h2>
-          <p>Tippe auf das <strong>+</strong> unten, um deinen ersten Stapel anzulegen — oder importiere einen vorhandenen JSON-Export.</p>
+          <p>Tippe auf das <strong>+</strong> unten, um deinen ersten Stapel anzulegen — oder importiere oben einen JSON-Export.</p>
         </div>
       ) : (
         <ul className="deck-list">

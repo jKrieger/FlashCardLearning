@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { createCard, getCard, updateCardContent } from '../db/cards';
 import { getDeck, touchDeck } from '../db/decks';
 import { useDocumentTitle } from '../util/title';
@@ -54,7 +55,10 @@ export default function CardEditor() {
 
   return (
     <div className="card-editor">
-      <Link to={`/decks/${deckId}`} className="btn btn-link">← {deckName}</Link>
+      <Link to={`/decks/${deckId}`} className="btn btn-ghost btn-sm btn-icon-text" aria-label={`Zurück zu ${deckName}`}>
+        <ArrowLeft size={18} aria-hidden="true" />
+        <span>{deckName}</span>
+      </Link>
       <h1>{pageTitle}</h1>
       <form onSubmit={onSubmit} className="form-card">
         <label>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Download, Pencil, Trash2 } from 'lucide-react';
 import { deleteDeck, getDeck, updateDeck } from '../db/decks';
 import { deleteCard, listCards } from '../db/cards';
 import { computeDeckStats } from '../domain/stats';
@@ -81,17 +82,34 @@ export default function DeckDetail() {
   return (
     <div className="deck-detail">
       <header className="page-header page-header-row">
-        <Link to="/" className="btn btn-ghost btn-sm" aria-label="Zurück zur Stapel-Übersicht">
-          ← Stapel
+        <Link to="/" className="btn btn-ghost btn-sm btn-icon-text" aria-label="Zurück zur Stapel-Übersicht">
+          <ArrowLeft size={18} aria-hidden="true" />
+          <span>Stapel</span>
         </Link>
         <div className="page-header-actions">
-          <button className="btn btn-ghost btn-sm" onClick={() => setEditName(true)}>Umbenennen</button>
-          <button className="btn btn-ghost btn-sm" onClick={onExport}>Exportieren</button>
           <button
-            className="btn btn-ghost btn-sm text-danger"
-            onClick={() => setConfirm({ kind: 'deleteDeck' })}
+            className="btn btn-ghost btn-icon"
+            onClick={() => setEditName(true)}
+            aria-label="Stapel umbenennen"
+            title="Umbenennen"
           >
-            Löschen
+            <Pencil size={18} aria-hidden="true" />
+          </button>
+          <button
+            className="btn btn-ghost btn-icon"
+            onClick={onExport}
+            aria-label="Stapel als JSON exportieren"
+            title="Exportieren"
+          >
+            <Download size={18} aria-hidden="true" />
+          </button>
+          <button
+            className="btn btn-ghost btn-icon text-danger"
+            onClick={() => setConfirm({ kind: 'deleteDeck' })}
+            aria-label="Stapel löschen"
+            title="Löschen"
+          >
+            <Trash2 size={18} aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -159,18 +177,20 @@ export default function DeckDetail() {
                   <div className="card-list-actions">
                     <Link
                       to={`/decks/${deck.id}/cards/${card.id}/edit`}
-                      className="btn btn-ghost btn-sm"
+                      className="btn btn-ghost btn-icon btn-sm"
                       aria-label="Karte bearbeiten"
+                      title="Bearbeiten"
                     >
-                      ✎
+                      <Pencil size={16} aria-hidden="true" />
                     </Link>
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm text-danger"
+                      className="btn btn-ghost btn-icon btn-sm text-danger"
                       aria-label="Karte löschen"
+                      title="Löschen"
                       onClick={() => setConfirm({ kind: 'deleteCard', cardId: card.id, preview: card.front.slice(0, 60) })}
                     >
-                      🗑
+                      <Trash2 size={16} aria-hidden="true" />
                     </button>
                   </div>
                 </li>

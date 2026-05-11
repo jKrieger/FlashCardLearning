@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Check, X } from 'lucide-react';
 import { getDeck } from '../db/decks';
 import { listCards, saveCard } from '../db/cards';
 import { applyAnswer, pickNextCard } from '../domain/algorithm';
@@ -116,9 +117,12 @@ export default function Study() {
   return (
     <div className="study">
       <div className="study-head">
-        <Link to={`/decks/${deck.id}`} className="btn btn-link">← {deck.name}</Link>
+        <Link to={`/decks/${deck.id}`} className="btn btn-ghost btn-sm btn-icon-text" aria-label={`Zurück zu ${deck.name}`}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          <span>{deck.name}</span>
+        </Link>
         <output className="study-session" aria-live="polite">
-          Sitzung: {sessionSeen} gesehen · {sessionRight} richtig · {sessionWrong} falsch
+          {sessionSeen} gesehen · {sessionRight} richtig · {sessionWrong} falsch
         </output>
       </div>
 
@@ -128,7 +132,7 @@ export default function Study() {
 
       {stats.masteredPercent === 100 && (
         <div className="alert alert-success" role="status">
-          🎉 Alle Karten in diesem Stapel sind sicher! Du kannst weiterlernen oder pausieren.
+          Alle Karten in diesem Stapel sind sicher! Du kannst weiterlernen oder pausieren.
         </div>
       )}
 
@@ -144,11 +148,13 @@ export default function Study() {
           {flipped ? (
             <>
               <div className="study-actions">
-                <button className="btn btn-wrong" onClick={() => answer(false)}>
-                  <span aria-hidden="true">✗ </span>Falsch
+                <button className="btn btn-wrong btn-icon-text" onClick={() => answer(false)}>
+                  <X size={20} aria-hidden="true" strokeWidth={2.5} />
+                  <span>Falsch</span>
                 </button>
-                <button className="btn btn-right" onClick={() => answer(true)}>
-                  <span aria-hidden="true">✓ </span>Richtig
+                <button className="btn btn-right btn-icon-text" onClick={() => answer(true)}>
+                  <Check size={20} aria-hidden="true" strokeWidth={2.5} />
+                  <span>Richtig</span>
                 </button>
               </div>
               <p className="study-hint muted">

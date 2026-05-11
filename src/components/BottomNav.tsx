@@ -1,5 +1,8 @@
-import { useMatch, useNavigate, useResolvedPath } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useMatch, useNavigate, useResolvedPath } from 'react-router-dom';
+import { Info as InfoIcon, Layers, Plus } from 'lucide-react';
+import type { ComponentType, SVGProps } from 'react';
+
+type IconType = ComponentType<SVGProps<SVGSVGElement> & { size?: number | string }>;
 
 type FabAction =
   | { kind: 'newDeck' }
@@ -15,7 +18,7 @@ function useFabAction(): FabAction {
   return null;
 }
 
-function NavItem({ to, icon, label }: { to: string; icon: string; label: string }) {
+function NavItem({ to, icon: Icon, label }: { to: string; icon: IconType; label: string }) {
   const resolved = useResolvedPath(to);
   const match = useMatch({ path: resolved.pathname, end: to === '/' });
   return (
@@ -24,7 +27,7 @@ function NavItem({ to, icon, label }: { to: string; icon: string; label: string 
       className={`bottom-nav-item ${match ? 'is-active' : ''}`}
       aria-current={match ? 'page' : undefined}
     >
-      <span className="bottom-nav-icon" aria-hidden="true">{icon}</span>
+      <Icon size={22} aria-hidden="true" strokeWidth={2} />
       <span className="bottom-nav-label">{label}</span>
     </Link>
   );
@@ -34,7 +37,6 @@ export default function BottomNav() {
   const navigate = useNavigate();
   const fab = useFabAction();
 
-  // Hide BottomNav on Study and CardEditor routes (immersive)
   const studyMatch = useMatch('/decks/:deckId/study');
   const newCardMatch = useMatch('/decks/:deckId/cards/new');
   const editCardMatch = useMatch('/decks/:deckId/cards/:cardId/edit');
@@ -60,7 +62,7 @@ export default function BottomNav() {
   return (
     <nav className="bottom-nav" aria-label="Hauptnavigation">
       <div className="bottom-nav-inner">
-        <NavItem to="/" icon="🗂️" label="Stapel" />
+        <NavItem to="/" icon={Layers} label="Stapel" />
         <div className="bottom-nav-spacer" aria-hidden="true" />
         <button
           type="button"
@@ -70,10 +72,10 @@ export default function BottomNav() {
           aria-label={fabLabel}
           title={fabLabel}
         >
-          <span aria-hidden="true">+</span>
+          <Plus size={26} aria-hidden="true" strokeWidth={2.5} />
         </button>
         <div className="bottom-nav-spacer" aria-hidden="true" />
-        <NavItem to="/info" icon="ℹ️" label="Info" />
+        <NavItem to="/info" icon={InfoIcon} label="Info" />
       </div>
     </nav>
   );

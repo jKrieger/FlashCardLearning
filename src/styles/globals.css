@@ -128,37 +128,6 @@ main:focus-visible {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 0.75rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.user-email {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  max-width: 16rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.offline-banner {
-  background: var(--learning);
-  color: white;
-  padding: 0.5rem 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
 }
 
 .app-title {
@@ -572,48 +541,6 @@ kbd {
   gap: 0.75rem;
 }
 .card-editor h1 { margin-top: 0.5rem; }
-
-/* Login */
-.login {
-  max-width: 28rem;
-  margin: 2rem auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.login h1 {
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-.tabs {
-  display: flex;
-  gap: 0;
-  background: var(--surface-muted);
-  border-radius: var(--radius);
-  padding: 0.25rem;
-}
-.tab {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 0.5rem 0.75rem;
-  font: inherit;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-radius: calc(var(--radius) - 2px);
-  min-height: 2.25rem;
-}
-.tab.is-active {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
-  font-weight: 600;
-}
-.login-links {
-  display: flex;
-  justify-content: flex-end;
-}
-.small { font-size: 0.85rem; }
 
 /* Modal / ConfirmDialog */
 .modal-backdrop {
